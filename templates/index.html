@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigQuery Release Notes Dashboard & Share Portal</title>
+  <meta name="description" content="Stay updated with the latest Google Cloud BigQuery features, announcements, deprecations, and fixes. Select updates and share them on X (Twitter) instantly.">
+  
+  <!-- Modern Typography (Inter & Outfit) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Custom Stylesheets -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-section">
+        <!-- Google Cloud BigQuery Tech Theme Logo SVG -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2005/svg">
+          <g>
+            <!-- Outer hexagons and network structure -->
+            <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="1.5" fill="rgba(59, 130, 246, 0.2)" stroke-linejoin="round"/>
+            <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="12" cy="7" r="1.5" fill="#ffffff" />
+            <circle cx="7" cy="9.5" r="1.2" fill="#ffffff" opacity="0.8" />
+            <circle cx="17" cy="9.5" r="1.2" fill="#ffffff" opacity="0.8" />
+          </g>
+        </svg>
+        <div class="logo-title">
+          <h1>BigQuery Release Notes</h1>
+          <p>Google Cloud Platform Feed Aggregator</p>
+        </div>
+      </div>
+      
+      <div class="sync-info-desktop">
+        <!-- Last Sync Info -->
+        <div class="status-bar" style="margin-bottom: 0;">
+          <div class="sync-indicator" id="sync-indicator">
+            <span class="dot"></span>
+            <span class="status-text">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Controls Panel -->
+    <section class="controls-panel" aria-label="Controls Panel">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search-input" class="search-input" placeholder="Search features, issues, dates, or keywords..." disabled>
+      </div>
+
+      <div class="action-buttons">
+        <button id="btn-refresh" class="btn btn-primary btn-refresh" title="Fetch live release notes from Google feed" disabled>
+          <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.2)"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10" stroke="#ffffff"></path>
+          </svg>
+          <span class="btn-text-node">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+              <path d="M23 4v6h-6M1 20v-6h6"></path>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            Refresh Feed
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Filter Tags Area -->
+    <nav class="filter-chips" id="filter-chips" aria-label="Filter category navigation">
+      <!-- Chips populated dynamically by Javascript -->
+    </nav>
+
+    <!-- Sync Details Subbar -->
+    <div class="status-bar">
+      <span id="last-updated">Synchronizing...</span>
+      <span class="tip-help">💡 Select multiple updates to compile a digest tweet!</span>
+    </div>
+
+    <!-- Notes Grid / List -->
+    <main class="notes-list" id="notes-list">
+      <!-- Skeleton cards populated on initial load -->
+      <div class="skeleton-card">
+        <div class="skeleton-header">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-badge"></div>
+        </div>
+        <div class="skeleton-line" style="width: 90%;"></div>
+        <div class="skeleton-line" style="width: 75%;"></div>
+        <div class="skeleton-line" style="width: 40%;"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom Floating Tray (Appears on selection) -->
+  <div class="floating-bar" id="floating-bar">
+    <div class="floating-info">
+      <div class="floating-count" id="floating-count">0</div>
+      <div class="floating-text">updates selected for sharing</div>
+    </div>
+    <div class="floating-actions">
+      <button class="btn btn-secondary" id="btn-clear-selection">Clear</button>
+      <button class="btn btn-primary" id="btn-tweet-selected">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 2px;">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+        Tweet Digest
+      </button>
+    </div>
+  </div>
+
+  <!-- Tweet Modal Overlay -->
+  <div class="modal-overlay" id="tweet-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          <span>Compose Tweet Preview</span>
+        </div>
+        <button class="btn-close" id="btn-close-modal" aria-label="Close composer modal">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="composer-wrapper">
+          <textarea id="tweet-textarea" class="tweet-textarea" placeholder="What's happening?"></textarea>
+          <div class="composer-footer">
+            <span class="tweet-tips">Preview and edit your tweet before posting</span>
+            <div id="char-count" class="char-counter">0 / 280</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="btn-cancel-tweet">Cancel</button>
+        <button class="btn btn-secondary" id="btn-copy-tweet" title="Copy tweet content to clipboard">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy Text
+        </button>
+        <button class="btn btn-tweet-confirm" id="btn-tweet-confirm">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          Tweet on X
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Deck -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Main JavaScript App -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
